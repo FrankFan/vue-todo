@@ -1,0 +1,21 @@
+{
+  "name": "vue-in-action",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "webpack-dev-server --mode=development --config webpack.config.js"
+  },
+  "author": "fanyong",
+  "license": "ISC",
+  "dependencies": {
+    "css-loader": "^0.28.11",
+    "vue": "^2.5.16",
+    "vue-loader": "14.2.2",
+    "vue-template-compiler": "^2.5.16",
+    "webpack": "^4.10.2",
+    "webpack-dev-server": "^3.1.4"
+  },
+  "devDependencies": {
+    "webpack-cli": "^3.0.2"
+  }
+}
