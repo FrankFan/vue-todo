@@ -1,19 +1,21 @@
 <template>
-  <p id="element">{{ message }}</p>
+  <div id="test">
+    {{ message }}
+  </div>
 </template>
 
 <script>
 export default {
   data() {
     return {
-      message: 'hello',
+      message: 'hello world',
     }
   }
 }
 </script>
 
 <style>
-  body {
-    background: red;
+  #test {
+    background: transparent;
   }
 </style>
