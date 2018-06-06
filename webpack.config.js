@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const HTMLPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -8,7 +9,7 @@ const config = {
   target: 'web',
   entry: path.join(__dirname, 'src/index.js'),
   output: {
-    filename: 'bundle.js',
+    filename: 'bundle.[hash:8].js',
     path: path.join(__dirname, 'dist'),
   },
   module: {
@@ -20,27 +21,6 @@ const config = {
       {
         test: /\.jsx$/,
         loader: 'babel-loader',
-      },
-      {
-        test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader',
-        ]
-      },
-      {
-        test: /\.styl$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          {
-            loader: 'postcss-loader',
-            options: {
-              sourceMap: true,
-            },
-          },
-          'stylus-loader',
-        ]
       },
       {
         test: /\.(gif|png|jpg|jpeg|svg)$/,
@@ -65,6 +45,29 @@ const config = {
 };
 
 if (isDev) {
+  config.module.rules.push(
+    {
+      test: /\.css$/,
+      use: [
+        'style-loader',
+        'css-loader',
+      ]
+    },
+    {
+      test: /\.styl$/,
+      use: [
+        'style-loader',
+        'css-loader',
+        {
+          loader: 'postcss-loader',
+          options: {
+            sourceMap: true,
+          },
+        },
+        'stylus-loader',
+      ]
+    },
+  );
   config.devtool = '#cheap-module-eval-source-map';
   config.devServer = {
     port: 8000,
@@ -78,6 +81,39 @@ if (isDev) {
   config.plugins.push(
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
+  );
+} else {
+  config.output.filename = '[name].[chunkHash:8].js';
+  config.module.rules.push(
+    {
+      test: /\.css$/,
+      use: [
+        'style-loader',
+        'css-loader',
+      ]
+    },
+    {
+      test: /\.styl$/,
+      use: [
+        MiniCssExtractPlugin.loader,
+        'css-loader',
+        {
+          loader: 'postcss-loader',
+          options: {
+            sourceMap: true,
+          },
+        },
+        'stylus-loader',
+      ]
+    },
+  );
+  config.plugins.push(
+    new MiniCssExtractPlugin({
+      // Options similar to the same options in webpackOptions.output
+      // both options are optional
+      filename: "[name].[contentHash:8].css",
+      chunkFilename: "[id].css"
+    })
   );
 }
 
