@@ -5,7 +5,7 @@
       <span
         v-for="state in states"
         :key="state"
-        :class="[state, filter === state ? 'active' : '']"
+        :class="[state, filter === state ? 'actived' : '']"
         @click="toggleFilter(state)"
       >
         {{state}}
