@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const HTMLPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -35,6 +36,7 @@ const config = {
     ]
   },
   plugins: [
+    new CleanWebpackPlugin('dist', {}),
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: isDev ? '"development"' : '"production"',
@@ -83,6 +85,10 @@ if (isDev) {
     new webpack.NoEmitOnErrorsPlugin(),
   );
 } else {
+  config.entry = {
+    app: path.join(__dirname, 'src/index.js'),
+    vendor: ['vue']
+  }
   config.output.filename = '[name].[chunkHash:8].js';
   config.module.rules.push(
     {
@@ -113,7 +119,10 @@ if (isDev) {
       // both options are optional
       filename: "[name].[contentHash:8].css",
       chunkFilename: "[id].css"
-    })
+    }),
+    new webpack.optimize.SplitChunksPlugin({
+      name: 'vendor'
+    }),
   );
 }
 
