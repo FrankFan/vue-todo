@@ -1,22 +1,23 @@
 <template>
   <div id="app">
     <div id="cover"></div>
-    <Header></Header>
+    <Header />
+    <Todo></Todo>
+    <Footer />
   </div>
 </template>
 
 <script>
-import Header from './todo/header.vue';
+import Header from './Todo/header.vue';
+import Footer from './Todo/footer.jsx';
+import Todo from './Todo/todo.vue';
 
 export default {
   components: {
     Header,
+    Footer,
+    Todo,
   },
-  data() {
-    return {
-      message: 'hello world',
-    }
-  }
 }
 </script>
 
