@@ -1,16 +1,27 @@
 const path = require('path');
 const webpack = require('webpack');
-const HTMLPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const HTMLPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const chalk = require('chalk');
+const configA = require('./tools/config');
+const utils = require('./tools/utils');
 
 const isDev = process.env.NODE_ENV === 'development';
+console.log(chalk.white.bgGreen('current mode is ', isDev ? 'development' : 'production'));
+
+
+let entries = utils.getMultiEntry('./src/' + configA.moduleName + '/*/*.js');
+
+console.log(entries);
+
 
 const config = {
-  target: 'web',
-  entry: path.join(__dirname, 'src/index.js'),
+  // entry: path.join(__dirname, 'src/index.js'),
+  entry: entries,
   output: {
-    filename: 'bundle.[hash:8].js',
+    filename: '[name].js',
     path: path.join(__dirname, 'dist'),
   },
   module: {
@@ -24,7 +35,7 @@ const config = {
         loader: 'babel-loader',
       },
       {
-        test: /\.(gif|png|jpg|jpeg|svg)$/,
+        test: /\.(png|gif|jpg|jpeg|svg)$/,
         use: {
           loader: 'url-loader', // 把图片转base64代码，减少http请求，url-loader基于file-loader的封装
           options: {
@@ -36,17 +47,13 @@ const config = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin('dist', {}),
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: isDev ? '"development"' : '"production"',
-      }
-    }),
-    new HTMLPlugin(),
+    new VueLoaderPlugin(),
+    // new HTMLPlugin(),
   ]
 };
 
 if (isDev) {
+  config.mode = 'development';
   config.module.rules.push(
     {
       test: /\.css$/,
@@ -56,7 +63,7 @@ if (isDev) {
       ]
     },
     {
-      test: /\.styl$/,
+      test: /\.styl(us)?$/,
       use: [
         'style-loader',
         'css-loader',
@@ -84,12 +91,29 @@ if (isDev) {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
   );
+
+  Object.keys(entries).forEach(pathname => {
+    let conf = {
+      filename: `${pathname}/index.html`,
+      template: 'index.html',
+      inject: true,
+      chunks: ['common/vendor', 'common/manifest', pathname],
+    };
+
+    config.plugins.push(new HTMLPlugin(conf));
+  });
 } else {
-  config.entry = {
-    app: path.join(__dirname, 'src/index.js'),
-    vendor: ['vue']
-  }
-  config.output.filename = '[name].[chunkHash:8].js';
+  config.mode = 'production';
+  // config.entry = {
+  //   vendor: ['vue'],
+  //   app: path.join(__dirname, 'src/index.js'),
+  // };
+  // config.output.filename = '[name].[chunkHash:6].js';
+  config.output = {
+    path: configA.build.assetsRoot,
+    filename: utils.assetsPath('[name]/[name].[chunkhash].js'),
+    chunkFilename: utils.assetsPath('chunk/[id].[chunkhash].js')
+  },
   config.module.rules.push(
     {
       test: /\.css$/,
@@ -99,7 +123,7 @@ if (isDev) {
       ]
     },
     {
-      test: /\.styl$/,
+      test: /\.styl(us)?$/,
       use: [
         MiniCssExtractPlugin.loader,
         'css-loader',
@@ -114,16 +138,33 @@ if (isDev) {
     },
   );
   config.plugins.push(
+    new CleanWebpackPlugin('dist', {}),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: "[name].[contentHash:8].css",
+      filename: "[name].[contentHash:6].css",
       chunkFilename: "[id].css"
     }),
     new webpack.optimize.SplitChunksPlugin({
       name: 'vendor'
     }),
   );
-}
+  // HtmlWebpackPlugin
+  Object.keys(entries).forEach(pathname => {
+    let conf = {
+      filename: `${pathname}/index.html`,
+      template: 'index.html',
+      inject: true,
+      chunks: ['vendor', 'manifest', pathname],
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeAttributeQuotes: true
+      },
+      chunksSortMode: 'dependency'
+    };
+    config.plugins.push(new HTMLPlugin(conf));
+  });
+};
 
 module.exports = config;

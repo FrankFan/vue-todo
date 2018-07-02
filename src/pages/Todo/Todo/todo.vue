@@ -1,22 +1,23 @@
 <template>
   <section class="real-app">
-    <input 
+    <input
       type="text"
       class="add-input"
       autofocus
-      placeholder="接下去要做什么?"
+      placeholder="What to do next?"
       @keyup.enter="addTodo"
     />
-    <Item 
+    <Item v-if="todos.length"
       :todo="todo"
-      v-for="todo in filteredTodos"
+      v-for="todo in filterTodos"
       :key="todo.id"
       @del="deleteTodo"
     />
-    <Tabs 
-      :filter="filter" 
+    <p class="empty" v-else>Nothing left in the List.</p>
+    <Tabs
       :todos="todos"
-      @toggle="toggleFilter"
+      :filter="filter"
+      @toggle="todoFilter"
       @clearAllCompleted="clearAllCompleted"
     />
   </section>
@@ -25,6 +26,7 @@
 <script>
 import Item from './item.vue';
 import Tabs from './tabs.vue';
+
 let id = 0;
 
 export default {
@@ -39,37 +41,38 @@ export default {
     Tabs,
   },
   computed: {
-    filteredTodos() {
+    filterTodos() {
       if (this.filter === 'all') {
         return this.todos;
       }
-      const completed = this.filter === 'completed';
-      return this.todos.filter(todo => todo.completed === completed);
+      const done = this.filter === 'completed';
+      return this.todos.filter(todo => todo.done === done);
     }
   },
   methods: {
     addTodo(e) {
-      console.log('addTodo');
-      this.todos.unshift({
-        id: id++,
-        content: e.target.value.trim(),
-        completed: false,
-      });
-      e.target.value = '';
+      const inputValue = e.target.value.trim();
+      if (inputValue) {
+        this.todos.unshift({
+          id: id++,
+          content: inputValue,
+          done: false,
+        });
+        e.target.value = '';
+      }
     },
     deleteTodo(id) {
-      this.todos.splice(this.todos.findIndex(todo => todo.id === id), 1);
+      this.todos.splice(this.todos.filter(todo => todo.id === id), 1);
     },
-    toggleFilter(state) {
+    todoFilter(state) {
       this.filter = state;
     },
     clearAllCompleted() {
-      this.todos = this.todos.filter(todo => !todo.completed);
+      this.todos = this.todos.filter(todo => !todo.done);
     }
   }
 }
 </script>
-
 
 <style lang="stylus" scoped>
 .real-app{
@@ -98,4 +101,3 @@ export default {
   box-shadow: inset 0 -2px 1px rgba(0,0,0,0.03);
 }
 </style>
-

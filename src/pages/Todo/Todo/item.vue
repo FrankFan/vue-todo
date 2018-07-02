@@ -1,11 +1,11 @@
 <template>
-  <div :class="['todo-item', todo.completed ? 'completed' : '']">
-    <input 
+  <div :class="['todo-item', todo.done ? 'completed' : '']">
+    <input
       type="checkbox"
       class="toggle"
-      v-model="todo.completed"
+      v-model="todo.done"
     />
-    <label>{{todo.content}}</label>
+    <label>{{ todo.content }}</label>
     <button class="destory" @click="deleteTodo"></button>
   </div>
 </template>
@@ -16,11 +16,10 @@ export default {
     todo: {
       type: Object,
       required: true,
-    }
+    },
   },
   methods: {
     deleteTodo() {
-      console.log('deleteTodo');
       this.$emit('del', this.todo.id);
     }
   }
@@ -91,3 +90,4 @@ export default {
   outline none
 }
 </style>
+

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div id="cover"></div>
+    <div class="cover"></div>
     <Header />
     <Todo />
     <Footer />
@@ -9,15 +9,15 @@
 
 <script>
 import Header from './Todo/header.vue';
-import Footer from './Todo/footer.jsx';
 import Todo from './Todo/todo.vue';
+import Footer from './Todo/footer.jsx';
 
 export default {
   components: {
     Header,
-    Footer,
     Todo,
-  },
+    Footer,
+  }
 }
 </script>
 
@@ -29,7 +29,7 @@ export default {
   top 0
   bottom 0
 }
-#cover{
+.cover{
   position absolute
   left 0
   top 0
@@ -40,3 +40,4 @@ export default {
   z-index -1
 }
 </style>
+
